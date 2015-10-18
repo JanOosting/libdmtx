@@ -52,7 +52,7 @@ Now you should see following output:
 
 Finally run:
 
-  $ gcc -shared -o dmtx.dll libdmtx_la-dmtx.o -Wl,--out-implib,libdmtx.a
+  $ gcc -shared -static-libgcc -o dmtx.dll libdmtx_la-dmtx.o -Wl,--out-implib,libdmtx.a
 
 Now you should have working dmtx.dll in the folder .libs.
 
