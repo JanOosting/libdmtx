@@ -39,7 +39,7 @@ Open the MSYS shell and run the following:
 
   $ ./configure
   $ make
-  $ sudo make install
+  $ make install
 
 Go to folder .libs:
 
@@ -55,6 +55,27 @@ Finally run:
   $ gcc -shared -static-libgcc -o dmtx.dll libdmtx_la-dmtx.o -Wl,--out-implib,libdmtx.a
 
 Now you should have working dmtx.dll in the folder .libs.
+
+Problems with "configure" step
+----------------------------------------
+If you obtained libdmtx from Git you may have received an error
+like "./configure: No such file or directory". Run this command
+before trying again:
+
+  $ ./autogen.sh
+
+The autogen.sh command requires autoconf, automake, libtool, and
+pkgconfig to be installed on your system.
+
+For MingW autogen.sh has some hardcoded paths. Within msys 'c:\MingW\msys\1.0\' becomes
+the root path. Create a directory 'mingw' in that directory and copy the directories 
+bin, include, lib, libecec, mingw32, share, and var from 'c:\MingW' to 
+'c:\MingW\msys\1.0\mingw'
+
+The configure script also offers many options for customizing the
+build process, described in detail by running:
+
+  $ ./configure --help
 
 
 4. This Document

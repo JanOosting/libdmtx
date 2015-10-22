@@ -23,20 +23,22 @@
  * \brief  GETTIMEOFDAY version
  * \return Time now
  */
-extern DmtxTime
+extern DmtxTime *
 dmtxTimeNow(void)
 {
    DmtxPassFail err;
    struct timeval tv;
-   DmtxTime tNow;
+   DmtxTime *tNow;
+   tNow = (DmtxTime *)calloc(1, sizeof(DmtxTime));
+   if(tNow == NULL)
+      return NULL;
 
    err = gettimeofday(&tv, NULL);
    if(err != 0)
       ; /* XXX handle error better here */
 
-   tNow.sec = tv.tv_sec;
-   tNow.usec = tv.tv_usec;
-
+   tNow->sec = tv.tv_sec;
+   tNow->usec = tv.tv_usec;
    return tNow;
 }
 
@@ -49,12 +51,15 @@ dmtxTimeNow(void)
  * \brief  MICROSOFT VC++ version
  * \return Time now
  */
-extern DmtxTime
+extern DmtxTime *
 dmtxTimeNow(void)
 {
    FILETIME ft;
    unsigned __int64 tm;
-   DmtxTime tNow;
+   DmtxTime *tNow;
+   tNow = (DmtxTime *)calloc(1, sizeof(DmtxTime));
+   if(tNow == NULL)
+      return NULL;
 
    GetSystemTimeAsFileTime(&ft);
 
@@ -63,8 +68,8 @@ dmtxTimeNow(void)
    tm |= ft.dwLowDateTime;
    tm /= 10;
 
-   tNow.sec = tm / 1000000UL;
-   tNow.usec = tm % 1000000UL;
+   tNow->sec = tm / 1000000UL;
+   tNow->usec = tm % 1000000UL;
 
    return tNow;
 }
@@ -78,23 +83,39 @@ dmtxTimeNow(void)
  * \brief  Generic 1 second resolution version
  * \return Time now
  */
-extern DmtxTime
+extern DmtxTime *
 dmtxTimeNow(void)
 {
    time_t s;
-   DmtxTime tNow;
+   DmtxTime *tNow;
+   tNow = (DmtxTime *)calloc(1, sizeof(DmtxTime));
+   if(tNow == NULL)
+      return NULL;
 
    s = time(NULL);
    if(errno != 0)
       ; /* XXX handle error better here */
 
-   tNow.sec = s;
-   tNow.usec = 0;
+   tNow->sec = s;
+   tNow->usec = 0;
 
    return tNow;
 }
 
 #endif
+
+extern DmtxPassFail 
+dmtxTimeDestroy(DmtxTime **t)
+{
+   if(t == NULL || *t == NULL)
+      return DmtxFail;
+
+   free(*t);
+
+   *t = NULL;
+
+   return DmtxPass;
+}
 
 /**
  * \brief  Add milliseconds to time t
@@ -102,8 +123,8 @@ dmtxTimeNow(void)
  * \param  msec
  * \return Adjusted time
  */
-extern DmtxTime
-dmtxTimeAdd(DmtxTime t, long msec)
+extern DmtxPassFail
+dmtxTimeAdd(DmtxTime *t, long msec)
 {
    int usec;
 
@@ -114,16 +135,16 @@ dmtxTimeAdd(DmtxTime t, long msec)
       usec = DMTX_TIME_PREC_USEC;
 
    /* Add time */
-   t.sec += usec/DMTX_USEC_PER_SEC;
-   t.usec += usec%DMTX_USEC_PER_SEC;
+   t->sec += usec/DMTX_USEC_PER_SEC;
+   t->usec += usec%DMTX_USEC_PER_SEC;
 
    /* Roll extra usecs into secs */
-   while(t.usec >= DMTX_USEC_PER_SEC) {
-      t.sec++;
-      t.usec -= DMTX_USEC_PER_SEC;
+   while(t->usec >= DMTX_USEC_PER_SEC) {
+      t->sec++;
+      t->usec -= DMTX_USEC_PER_SEC;
    }
 
-   return t;
+   return DmtxPass;
 }
 
 /**
@@ -132,13 +153,21 @@ dmtxTimeAdd(DmtxTime t, long msec)
  * \return 1 (true) | 0 (false)
  */
 extern int
-dmtxTimeExceeded(DmtxTime timeout)
+dmtxTimeExceeded(DmtxTime *timeout)
 {
-   DmtxTime now;
-
+   DmtxTime *now;
+   int res;
+   
+   if (timeout == NULL)
+     return 0;
+   
    now = dmtxTimeNow();
 
-   return (now.sec > timeout.sec || (now.sec == timeout.sec && now.usec > timeout.usec));
+   res = (now->sec > timeout->sec || (now->sec == timeout->sec && now->usec > timeout->usec));
+   
+   dmtxTimeDestroy(&now);
+   
+   return res;
 }
 
 #undef DMTX_TIME_PREC_USEC

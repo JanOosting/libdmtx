@@ -75,7 +75,7 @@ dmtxRegionFindNext(DmtxDecode *dec, DmtxTime *timeout)
          return reg;
 
       /* Ran out of time? */
-      if(timeout != NULL && dmtxTimeExceeded(*timeout))
+      if(timeout != NULL && dmtxTimeExceeded(timeout))
          break;
    }
 

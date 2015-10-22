@@ -520,9 +520,10 @@ typedef struct DmtxQuadruplet_struct {
 } DmtxQuadruplet;
 
 /* dmtxtime.c */
-extern DmtxTime dmtxTimeNow(void);
-extern DmtxTime dmtxTimeAdd(DmtxTime t, long msec);
-extern int dmtxTimeExceeded(DmtxTime timeout);
+extern DmtxTime *dmtxTimeNow(void);
+extern DmtxPassFail dmtxTimeDestroy(DmtxTime **t);
+extern DmtxPassFail dmtxTimeAdd(DmtxTime *t, long msec);
+extern int dmtxTimeExceeded(DmtxTime *timeout);
 
 /* dmtxencode.c */
 extern DmtxEncode *dmtxEncodeCreate(void);

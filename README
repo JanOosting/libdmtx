@@ -33,6 +33,14 @@ you require clarification on licensing. It's not complicated, but
 it's important to us that all license terms are respected (not
 just ours).
 
+The current fork JanOosting/libdmtx is meant to provide timeout 
+functionality to Delphi projects.
+Delphi does not handle structs as return values of functions from 
+DLLs. The functionality related to timeouts has been rewritten to 
+be handled as pointers. 
+It has been tested in combination with delphidmtx, 
+https://github.com/JanOosting/delphidmtx , which now has a compiled 
+DLL based on this fork.
 
 2. Project Components
 -----------------------------------------------------------------
